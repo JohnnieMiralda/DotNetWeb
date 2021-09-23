@@ -38,6 +38,7 @@ namespace DotNetWeb.Parser
         {
             Tag();
             InnerTemplate();
+            return null;
         }
         
         private void InnerTemplate()
@@ -82,14 +83,13 @@ namespace DotNetWeb.Parser
                 case TokenType.Percentage:
                     return IfStmt();
                 case TokenType.Hyphen:
-                    ForeachStatement();
-                    break;
+                    return ForeachStatement();
                 default:
                     throw new ApplicationException("Unrecognized statement");
             }
         }
 
-        private void ForeachStatement()
+        private Statement ForeachStatement()
         {
             Match(TokenType.Hyphen);
             Match(TokenType.Percentage);
@@ -104,13 +104,13 @@ namespace DotNetWeb.Parser
             Match(TokenType.Percentage);
             Match(TokenType.CloseBrace);
             /////
-            ver statement=Template();
+            var statement=Template();
             Match(TokenType.OpenBrace);
             Match(TokenType.Percentage);
             Match(TokenType.EndForEachKeyword);
             Match(TokenType.Percentage);
             Match(TokenType.CloseBrace);
-            return new ForeachStatement();
+            return new ForeachStatement(null,statement);
         }
 
         private Statement IfStmt()
@@ -247,9 +247,14 @@ namespace DotNetWeb.Parser
         {
             if (this.lookAhead.TokenType == TokenType.Identifier)
             {
-                Assignation();
+                var symbol = EnvironmentManager.GetSymbol(this.lookAhead.Lexeme);
+                if (this.lookAhead.TokenType != TokenType.Identifier)
+                {
+                    return Assignation(symbol.Id);
+                }
                 Assignations();
             }
+            return null;
         }
 
         private Statement Assignation(Id id)

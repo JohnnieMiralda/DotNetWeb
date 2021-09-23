@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetWeb.Core.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,7 +9,12 @@ namespace DotNetWeb.Core.Statements
     {
         public ForeachStatement(TypedExpression expression, Statement statement)
         {
+            Expression = expression;
+            Statement = statement;
         }
+
+        public TypedExpression Expression { get; }
+        public Statement Statement { get; }
 
         public override string Generate()
         {
